@@ -3,6 +3,6 @@ import { Query, Resolver } from "type-graphql";
 export default class t {
     @Query(() => String)
     async hello() {
-        return "hello";
+        return "world";
     }
 }
