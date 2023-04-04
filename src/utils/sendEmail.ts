@@ -23,14 +23,14 @@ export async function sendEmail(email: string, userId: string, subjectType: Subj
         },
     });
 
-    const url = generateConfirmationLink(userId);
+    const token = generateToken(userId);
 
     // send mail with defined transport object
     const info = await transporter.sendMail({
         from: '"Konrad Perlicki" <konrad.perlicki01@gmail.com>', // sender address
         to: email, // list of receivers
         subject: subjectType, // Subject line
-        html: generateHtmlDesc(subjectType, url), // html body
+        html: generateHtmlDesc(subjectType, token), // html body
     });
 
     // Preview only available when sending through an Ethereal account
@@ -38,16 +38,16 @@ export async function sendEmail(email: string, userId: string, subjectType: Subj
     return String(nodemailer.getTestMessageUrl(info));
 }
 
-const generateConfirmationLink = (userId: string) => {
+const generateToken = (userId: string) => {
     const token = v4();
 
     cache.set(confirmationPrefix + token, userId, 60 * 60 * 24);
-    return `http://localhost:4000/user/confirm/${token}`;
+    return token;
 };
 
-const generateHtmlDesc = (subjectType: Subject, url: string) => {
+const generateHtmlDesc = (subjectType: Subject, token: string) => {
     if (subjectType === Subject.REGISTER) {
-        return `Welcome to our system! You have successfully created account. Last thing you have to do is confirm your email by clicking that link <a href=${url}>${url}</a>`;
+        return `Welcome to our system! You have successfully created account. Last thing you have to do is confirm your email with token:${token}`;
     }
 
     return ``;
