@@ -1,4 +1,5 @@
 import { DataSource } from "typeorm";
+import User from "./entity/User";
 
 const AppDataSource = new DataSource({
     type: "postgres",
@@ -9,7 +10,7 @@ const AppDataSource = new DataSource({
     synchronize: process.env.NODE_ENV === "production" ? false : true,
     logging: process.env.NODE_ENV === "production" ? false : true,
     database: process.env.AWS_POSTGRES_DBNAME,
-    entities: ["src/entity/*.*"],
+    entities: [User],
     migrations: ["src/migrations/*.*"],
     subscribers: [],
     migrationsTableName: "migrations",
