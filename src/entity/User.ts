@@ -12,6 +12,7 @@ import {
 } from "typeorm";
 
 import bcrypt from "bcryptjs";
+import { Subject, sendEmail } from "../utils/sendEmail";
 
 export enum UserRole {
     ADMIN = "admin",
@@ -23,7 +24,7 @@ export enum UserRole {
 export default class User extends BaseEntity {
     @Field(() => ID)
     @PrimaryGeneratedColumn("uuid")
-    id: number;
+    id: string;
 
     @Field({ nullable: true })
     @Column({ nullable: true })
@@ -48,6 +49,13 @@ export default class User extends BaseEntity {
     role: UserRole;
 
     @Field()
+    @Column({
+        type: "boolean",
+        default: false,
+    })
+    validatedEmail: boolean;
+
+    @Field()
     @CreateDateColumn()
     createdAt: Date;
 
@@ -66,5 +74,13 @@ export default class User extends BaseEntity {
     @BeforeInsert()
     async hashPassword() {
         this.password = await bcrypt.hash(this.password, 12);
+    }
+
+    async validatePassword(comparedPassword: string) {
+        return await bcrypt.compare(comparedPassword, this.password);
+    }
+
+    async sendValidationEmail() {
+        return await sendEmail(this.email, this.id, Subject.REGISTER);
     }
 }
