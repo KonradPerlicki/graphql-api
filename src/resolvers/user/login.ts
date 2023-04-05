@@ -2,6 +2,7 @@ import { Arg, Ctx, Mutation, Resolver } from "type-graphql";
 import User from "../../entity/User";
 import LoginInput from "../../types/user/LoginInput";
 import { Context } from "../../types/Context";
+import { UserSession } from "../../types/UserSession";
 
 @Resolver()
 export default class LoginResolver {
@@ -24,7 +25,7 @@ export default class LoginResolver {
             return null;
         }
 
-        ctx.req.session!.userId = user.id;
+        (ctx.req.session as UserSession).userId = user.id;
 
         return user;
     }
