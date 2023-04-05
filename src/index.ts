@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-dotenv.config({ path: "./.env" });
+dotenv.config();
 import AppDataSource from "./data-source";
 import sessionConfig from "./session";
 import session from "express-session";
