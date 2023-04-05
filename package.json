@@ -45,6 +45,7 @@
         "winston": "^3.8.2"
     },
     "devDependencies": {
+        "@faker-js/faker": "^7.6.0",
         "@types/bcryptjs": "^2.4.2",
         "@types/connect-pg-simple": "^7.0.0",
         "@types/connect-redis": "^0.0.19",
