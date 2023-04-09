@@ -5,5 +5,7 @@ module.exports = {
     testMatch: ["**/**/*.test.ts"],
     verbose: true,
     forceExit: true,
+    globalSetup: "./jest-global-setup.ts",
+    globalTeardown: "./jest-global-teardown.ts",
     //clearMocks: true
 };
