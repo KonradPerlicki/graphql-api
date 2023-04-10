@@ -34,11 +34,11 @@ export async function sendEmail(email: string, userId: string, subjectType: Subj
     });
 
     // Preview only available when sending through an Ethereal account
-    logger.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+    logger.info("Preview URL: %s", nodemailer.getTestMessageUrl(info));
     return String(nodemailer.getTestMessageUrl(info));
 }
 
-const generateToken = (userId: string) => {
+export const generateToken = (userId: string) => {
     const token = v4();
 
     cache.set(confirmationPrefix + token, userId, 60 * 60 * 24);
