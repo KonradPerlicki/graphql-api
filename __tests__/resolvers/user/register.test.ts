@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import getApolloServer from "../../../src/apolloServer";
 import RegisterInput from "../../../src/types/user/RegisterInput";
-import { ValidationError, validate } from "class-validator";
+import { validate } from "class-validator";
 import GraphQLValidationError from "../../../src/errors/GraphQLValidationError";
 
 const email = faker.internet.email();
@@ -9,7 +9,7 @@ const email = faker.internet.email();
 class MockRegisterInput extends RegisterInput {
     data: RegisterInput;
 }
-ValidationError;
+
 const apolloServer = getApolloServer({
     Mutation: {
         async register(_: any, { data }: MockRegisterInput) {
