@@ -1,7 +1,7 @@
-import apolloServer from "./../src/apolloServer";
+import getApolloServer from "../src/apolloServer";
 
 it("runs a healthcheck against schema", async () => {
-    let result = await apolloServer.executeOperation({
+    let result = await getApolloServer().executeOperation({
         query: `
             query {
                 hello
@@ -14,7 +14,7 @@ it("runs a healthcheck against schema", async () => {
         hello: "world",
     });
 
-    result = await apolloServer.executeOperation({
+    result = await getApolloServer().executeOperation({
         query: `
             query {
                 hello-wrong

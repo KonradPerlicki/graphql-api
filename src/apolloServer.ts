@@ -10,6 +10,8 @@ import queryComplexity, {
     simpleEstimator,
     fieldExtensionsEstimator,
 } from "graphql-query-complexity";
+import { makeExecutableSchema } from "@graphql-tools/schema";
+import { addMocksToSchema } from "@graphql-tools/mock";
 
 const schema = buildSchemaSync({
     resolvers: [__dirname + "/resolvers/**/*.ts"],
@@ -20,9 +22,17 @@ const schema = buildSchemaSync({
     } */
 });
 
-const apolloServer = new ApolloServer({
-    schema,
-    /* validationRules: [
+const getApolloServer = (resolver?: object) =>
+    new ApolloServer({
+        schema:
+            process.env.NODE_ENV === "test"
+                ? addMocksToSchema({
+                      schema: makeExecutableSchema({ typeDefs: schema }),
+                      preserveResolvers: true,
+                      resolvers: resolver,
+                  })
+                : schema,
+        /* validationRules: [
         queryComplexity({
             maximumComplexity: 3,
             variables: {},
@@ -37,12 +47,12 @@ const apolloServer = new ApolloServer({
             ]
         })
     ], */
-    plugins: [
-        process.env.NODE_ENV === "production"
-            ? ApolloServerPluginLandingPageProductionDefault
-            : ApolloServerPluginLandingPageGraphQLPlayground,
-    ],
-    context: ({ req, res }) => ({ req, res }),
-});
+        plugins: [
+            process.env.NODE_ENV === "production"
+                ? ApolloServerPluginLandingPageProductionDefault
+                : ApolloServerPluginLandingPageGraphQLPlayground,
+        ],
+        context: ({ req, res }) => ({ req, res }),
+    });
 
-export default apolloServer;
+export default getApolloServer;

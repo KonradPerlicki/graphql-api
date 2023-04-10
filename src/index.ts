@@ -7,7 +7,7 @@ import sessionConfig from "./session";
 import session from "express-session";
 import logger from "./utils/logger";
 import morgan from "morgan";
-import apolloServer from "./apolloServer";
+import getApolloServer from "./apolloServer";
 
 const app = express();
 
@@ -18,6 +18,7 @@ const main = async () => {
     app.use(express.json());
     app.use(morgan("dev"));
 
+    const apolloServer = getApolloServer();
     await apolloServer.start();
 
     apolloServer.applyMiddleware({ app });
