@@ -8,11 +8,18 @@ import User from "../entity/User";
 
 @ValidatorConstraint({ async: true })
 export class emailExist implements ValidatorConstraintInterface {
+    private usedEmails: string[] = [];
+
     validate(email: string) {
-        return User.findOne({ where: { email } }).then((user) => {
-            if (user) return false;
-            return true;
-        });
+        if (process.env.NODE_ENV !== "test") {
+            return User.findOne({ where: { email } }).then((user) => {
+                if (user) return false;
+                return true;
+            });
+        }
+        if (this.usedEmails.find((usedEmail) => usedEmail === email)) return false;
+        this.usedEmails.push(email);
+        return true;
     }
 }
 

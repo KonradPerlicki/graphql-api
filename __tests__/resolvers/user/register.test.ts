@@ -71,26 +71,6 @@ describe("MUTATION register", () => {
         expect(typeof result.data!.register.validationLink).toBe("string");
     });
 
-    it.skip("should throw duplicated emails error", async () => {
-        const result = await apolloServer.executeOperation({
-            query: `
-                mutation{
-                    register(data: {
-                    password:"${faker.internet.password()}",
-                    email:"${email}",
-                    }){
-                        id
-                    }
-                }
-            `,
-        });
-
-        expect(result.errors).toBeTruthy();
-        expect(
-            (result.errors as any)[0].extensions.exception.validationErrors[0].constraints
-        ).toHaveProperty("emailExist");
-    });
-
     it("should throw too short password error", async () => {
         const result = await apolloServer.executeOperation({
             query: `
@@ -113,5 +93,26 @@ describe("MUTATION register", () => {
             (result.errors as any)[0].extensions.extensions.validationErrors[0]
                 .constraints
         ).toHaveProperty("isLength");
+    });
+
+    it("should throw duplicated emails error", async () => {
+        const result = await apolloServer.executeOperation({
+            query: `
+                mutation{
+                    register(data: {
+                    password:"${faker.internet.password()}",
+                    email:"${email}",
+                    }){
+                        id
+                    }
+                }
+            `,
+        });
+
+        expect(result.errors).toBeTruthy();
+        expect(
+            (result.errors as any)[0].extensions.extensions.validationErrors[0]
+                .constraints
+        ).toHaveProperty("emailExist");
     });
 });
