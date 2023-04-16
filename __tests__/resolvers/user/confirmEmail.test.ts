@@ -1,17 +1,12 @@
 import { faker } from "@faker-js/faker";
 import { generateToken } from "../../../src/utils/sendEmail";
 import getApolloServer from "../../../src/apolloServer";
-import { cache } from "../../../src/cache";
-import { confirmationPrefix } from "../../../src/constants";
+import { confirm } from "../../../src/resolvers/user/confirmEmail";
 
 const apolloServer = getApolloServer({
     Mutation: {
         async confirmEmail(_: any, { token }: { token: string }) {
-            const userId = cache.get<string>(confirmationPrefix + token);
-            if (userId) {
-                return true;
-            }
-            return false;
+            return await confirm(token, true);
         },
     },
 });
