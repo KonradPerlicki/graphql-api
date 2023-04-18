@@ -1,10 +1,12 @@
 import { cache } from "./../../cache";
 import User from "../../entity/User";
-import { Arg, Mutation, Resolver } from "type-graphql";
+import { Arg, Mutation, Resolver, UseMiddleware } from "type-graphql";
 import { confirmationPrefix } from "../../constants";
+import { isGuest } from "../../middleware/isGuest";
 
 @Resolver()
 export default class ConfirmEmailResolver {
+    @UseMiddleware(isGuest)
     @Mutation(() => Boolean)
     async confirmEmail(@Arg("token") token: string): Promise<boolean> {
         return await confirm(token);

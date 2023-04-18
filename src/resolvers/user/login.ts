@@ -1,10 +1,12 @@
-import { Arg, Ctx, Mutation, Resolver } from "type-graphql";
+import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from "type-graphql";
 import User from "../../entity/User";
 import LoginInput from "../../types/user/LoginInput";
 import { Context } from "../../types/Context";
+import { isGuest } from "../../middleware/isGuest";
 
 @Resolver()
 export default class LoginResolver {
+    @UseMiddleware(isGuest)
     @Mutation(() => User, { nullable: true })
     async login(
         @Arg("datas") { email, password }: LoginInput,
