@@ -1,12 +1,19 @@
 import nodemailer from "nodemailer";
 import { v4 } from "uuid";
-import { confirmationPrefix } from "../constants";
+import { confirmationPrefix, forgotPasswordPrefix } from "../constants";
 import { cache } from "../cache";
 import logger from "./logger";
 
-export enum Subject {
-    REGISTER = "Welcome to our system",
-    DELETION = "Your account has been deleted",
+export class Subject {
+    static readonly REGISTER = new Subject("Welcome to our system", confirmationPrefix);
+    //static readonly DELETION = new Subject("Your account has been deleted", confirmationPrefix)
+    static readonly FORGOTPASSWORD = new Subject(
+        "Reset password request",
+        forgotPasswordPrefix
+    );
+
+    // private to disallow creating other instances of this type
+    private constructor(public readonly title: string, public readonly prefix: string) {}
 }
 
 export async function sendEmail(email: string, userId: string, subjectType: Subject) {
@@ -23,13 +30,13 @@ export async function sendEmail(email: string, userId: string, subjectType: Subj
         },
     });
 
-    const token = generateToken(userId);
+    const token = generateToken(userId, subjectType.prefix);
 
     // send mail with defined transport object
     const info = await transporter.sendMail({
         from: '"Konrad Perlicki" <konrad.perlicki01@gmail.com>', // sender address
         to: email, // list of receivers
-        subject: subjectType, // Subject line
+        subject: subjectType.title, // Subject line
         html: generateHtmlDesc(subjectType, token), // html body
     });
 
@@ -38,16 +45,21 @@ export async function sendEmail(email: string, userId: string, subjectType: Subj
     return String(nodemailer.getTestMessageUrl(info));
 }
 
-export const generateToken = (userId: string) => {
+export const generateToken = (userId: string, prefix: string) => {
     const token = v4();
 
-    cache.set(confirmationPrefix + token, userId, 60 * 60 * 24);
+    cache.set(prefix + token, userId, 60 * 60 * 24);
     return token;
 };
 
 const generateHtmlDesc = (subjectType: Subject, token: string) => {
+    console.log(subjectType);
     if (subjectType === Subject.REGISTER) {
         return `Welcome to our system! You have successfully created account. Last thing you have to do is confirm your email with token:${token}`;
+    }
+
+    if (subjectType === Subject.FORGOTPASSWORD) {
+        return `Your password reset request. Resetting token:${token}`;
     }
 
     return ``;
