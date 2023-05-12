@@ -6,12 +6,12 @@ import PasswordInput from "./Shared/PasswordInput";
 @InputType()
 export default class RegisterInput extends PasswordInput {
     constructor(data?: RegisterInput) {
-        super();
+        super(data?.password);
+
         if (data) {
             this.firstName = data.firstName;
             this.lastName = data.lastName;
             this.email = data.email;
-            this.password = data.password;
         }
     }
 

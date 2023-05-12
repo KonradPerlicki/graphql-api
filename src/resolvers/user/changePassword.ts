@@ -23,18 +23,9 @@ export default class ChangePasswordResolver {
     }
 }
 
-export function changePassword(token: string, password: string): Promise<User | null>;
-export function changePassword(
-    token: string,
-    password: string,
-    testEnv: boolean
-): Promise<User | null>;
-export async function changePassword(token: string, password: string, testEnv?: boolean) {
+async function changePassword(token: string, password: string) {
     const userId = cache.get<string>(forgotPasswordPrefix + token);
     if (!userId) return null;
-
-    if (testEnv) {
-    }
 
     const user = await User.findOneBy({ id: userId });
     if (!user) return null;
