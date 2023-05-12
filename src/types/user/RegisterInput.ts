@@ -1,10 +1,12 @@
 import { Length, IsEmail, IsOptional } from "class-validator";
 import { Field, InputType } from "type-graphql";
 import { EmailExist } from "../../middleware/emailExist";
+import PasswordInput from "./Shared/PasswordInput";
 
 @InputType()
-export default class RegisterInput {
+export default class RegisterInput extends PasswordInput {
     constructor(data?: RegisterInput) {
+        super();
         if (data) {
             this.firstName = data.firstName;
             this.lastName = data.lastName;
@@ -27,10 +29,4 @@ export default class RegisterInput {
     @IsEmail()
     @EmailExist({ message: "Email already exists" })
     email: string;
-
-    @Field()
-    @Length(6, 120, {
-        message: "Password must be minimum length of 6 and maximum of 120 characters",
-    })
-    password: string;
 }
