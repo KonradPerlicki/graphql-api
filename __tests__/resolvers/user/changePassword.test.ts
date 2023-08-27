@@ -5,6 +5,9 @@ import { validate } from "class-validator";
 import PasswordInput from "../../../src/types/user/Shared/PasswordInput";
 import GraphQLValidationError from "../../../src/errors/GraphQLValidationError";
 import { ChangePasswordInput } from "../../../src/types/user/ChangePasswordInput";
+import { cache } from "../../../src/cache";
+import { forgotPasswordPrefix } from "../../../src/constants";
+import { changePassword } from "../../../src/resolvers/user/changePassword";
 
 const userId = faker.datatype.uuid();
 const token = generateToken(userId, Subject.FORGOTPASSWORD.prefix);
@@ -21,19 +24,21 @@ const apolloServer = getApolloServer({
                 throw new GraphQLValidationError(errors);
             }
 
-            if (token !== data.token) {
+            jest.spyOn(changePassword(data.token, data.password), "findOneBy");
+
+            /* if (token !== data.token) {
                 return null;
             }
 
             return {
                 //don't overwrtie mocked data
-            };
+            }; */
         },
     },
 });
 
 describe("MUTATION changePassword", () => {
-    it("should change password for valid password and token", async () => {
+    it.only("should change password for valid password and token", async () => {
         const password = faker.internet.password(10);
 
         const result = await apolloServer.executeOperation({

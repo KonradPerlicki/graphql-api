@@ -2,7 +2,9 @@ import nodemailer from "nodemailer";
 import { v4 } from "uuid";
 import { confirmationPrefix, forgotPasswordPrefix } from "../constants";
 import { cache } from "../cache";
-import logger from "./logger";
+import createLogger from "./logger";
+
+const logger = createLogger(process.env.NODE_ENV as string);
 
 export class Subject {
     static readonly REGISTER = new Subject("Welcome to our system", confirmationPrefix);
@@ -53,7 +55,6 @@ export const generateToken = (userId: string, prefix: string) => {
 };
 
 const generateHtmlDesc = (subjectType: Subject, token: string) => {
-    console.log(subjectType);
     if (subjectType === Subject.REGISTER) {
         return `Welcome to our system! You have successfully created account. Last thing you have to do is confirm your email with token:${token}`;
     }
@@ -61,6 +62,4 @@ const generateHtmlDesc = (subjectType: Subject, token: string) => {
     if (subjectType === Subject.FORGOTPASSWORD) {
         return `Your password reset request. Resetting token:${token}`;
     }
-
-    return ``;
 };

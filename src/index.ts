@@ -5,9 +5,11 @@ dotenv.config();
 import AppDataSource from "./data-source";
 import sessionConfig from "./session";
 import session from "express-session";
-import logger from "./utils/logger";
+import createLogger from "./utils/logger";
 import morgan from "morgan";
 import getApolloServer from "./apolloServer";
+
+const logger = createLogger(process.env.NODE_ENV as string);
 
 const app = express();
 
