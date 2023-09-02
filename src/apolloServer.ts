@@ -12,6 +12,8 @@ import queryComplexity, {
 } from "graphql-query-complexity";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { addMocksToSchema } from "@graphql-tools/mock";
+import { createManufacturersLoader } from "./utils/manufacturersLoader";
+import { createProductsLoader } from "./utils/productsLoader";
 
 const schema = buildSchemaSync({
     resolvers: [`${__dirname}/resolvers/**/*.ts`],
@@ -47,12 +49,13 @@ const getApolloServer = (resolver?: object) =>
             ]
         })
     ], */
-        plugins: [
-            process.env.NODE_ENV === "production"
-                ? ApolloServerPluginLandingPageProductionDefault
-                : ApolloServerPluginLandingPageGraphQLPlayground,
-        ],
-        context: ({ req, res }) => ({ req, res }),
+        plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
+        context: ({ req, res }) => ({
+            req,
+            res,
+            manufacturersLoader: createManufacturersLoader(),
+            productsLoader: createProductsLoader(),
+        }),
     });
 
 export default getApolloServer;
