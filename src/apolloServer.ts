@@ -14,7 +14,7 @@ import { makeExecutableSchema } from "@graphql-tools/schema";
 import { addMocksToSchema } from "@graphql-tools/mock";
 
 const schema = buildSchemaSync({
-    resolvers: [__dirname + "/resolvers/**/*.ts"],
+    resolvers: [`${__dirname}/resolvers/**/*.ts`],
     /* authChecker: ({ context: { req } }) => {
         if(req.session.userId) return true;
         return false; // or false if access is denied

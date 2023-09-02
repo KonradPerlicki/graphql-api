@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import register from "../../../../src/resolvers/user/register";
 import User from "../../../../src/entity/User";
-import UserWithValidationLink from "../../../../src/entity/UserWithValidationLink";
+import User from "../../../../src/entity/User";
 
 const mutation = new register();
 
@@ -13,7 +13,7 @@ afterEach(() => {
 
 describe("Mutation REGISTER", () => {
     it("should register user", async () => {
-        const user = new UserWithValidationLink();
+        const user = new User();
         user.firstName = "John";
         user.lastName = "Doe";
         user.email = email;
@@ -33,6 +33,6 @@ describe("Mutation REGISTER", () => {
         expect(returned).toHaveProperty("validationLink");
         expect(returned.validationLink).toBe("validation link");
         expect(returned.email).toBe(email);
-        expect(returned).toBeInstanceOf(UserWithValidationLink);
+        expect(returned).toBeInstanceOf(User);
     });
 });

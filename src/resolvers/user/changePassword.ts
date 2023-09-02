@@ -1,4 +1,4 @@
-import { cache } from "./../../cache";
+import { cache } from "../../cache";
 import { Arg, Ctx, Mutation, Resolver } from "type-graphql";
 import bcrypt from "bcryptjs";
 import { Context } from "../../types/Context";

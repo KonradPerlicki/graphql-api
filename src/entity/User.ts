@@ -38,6 +38,9 @@ export default class User extends BaseEntity {
     @Column({ unique: true })
     email: string;
 
+    @Field({ nullable: true })
+    validationLink?: string;
+
     @Column()
     password: string;
 

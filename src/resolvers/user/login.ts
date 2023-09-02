@@ -9,7 +9,7 @@ export default class LoginResolver {
     @UseMiddleware(isGuest)
     @Mutation(() => User, { nullable: true })
     async login(
-        @Arg("datas") { email, password }: LoginInput,
+        @Arg("data") { email, password }: LoginInput,
         @Ctx() ctx: Context
     ): Promise<User | null> {
         const user = await User.findOne({ where: { email } });
