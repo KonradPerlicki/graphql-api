@@ -1,9 +1,5 @@
 import { isGuest } from "../../../src/middleware/isGuest";
 
-afterEach(() => {
-    jest.clearAllMocks();
-});
-
 const mockNext = jest.fn();
 
 describe("Middleware isGuest", () => {
@@ -24,14 +20,18 @@ describe("Middleware isGuest", () => {
         } catch (e: any) {
             expect(e.message).toBe("User is already authenticated");
         }
+
+        expect(mockNext).not.toHaveBeenCalled();
     });
 
-    it("should let the user through", async () => {
+    it("should let the user through when not logged in", async () => {
         await isGuest(
             {
                 context: {
                     req: {
-                        session: {},
+                        session: {
+                            userId: undefined,
+                        },
                     },
                 },
             } as any,

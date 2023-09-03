@@ -1,10 +1,4 @@
 import "reflect-metadata";
-import { faker } from "@faker-js/faker";
-import ChangePasswordResolver from "../../../../src/resolvers/user/changePassword";
-import { ChangePasswordInput } from "../../../../src/types/user/ChangePasswordInput";
-import { cache } from "../../../../src/cache";
-import User from "../../../../src/entity/User";
-import bcrypt from "bcryptjs";
 import { ManufacturerProductResolver } from "../../../../src/resolvers/manufacturer-product/ManufacturerProduct";
 import Product from "../../../../src/entity/Product";
 import Manufacturer from "../../../../src/entity/Manufacturer";
@@ -22,11 +16,6 @@ const manufacturer = {
     name: "manufacturer",
 };
 
-const manufacturerProduct = {
-    manufacturerId: 1,
-    productId: 1,
-};
-
 afterEach(() => {
     jest.clearAllMocks();
 });
@@ -34,51 +23,53 @@ afterEach(() => {
 describe("Resolver ManufacturerProductResolver", () => {
     describe("Mutation createProduct", () => {
         it("should create product with valid data", async () => {
-            jest.spyOn(Product, "create").mockImplementationOnce(
-                () =>
-                    <any>{
-                        save: jest.fn().mockResolvedValueOnce({ product }),
-                    }
-            );
+            const productName = "product";
+            jest.spyOn(Product, "create").mockReturnValueOnce(<any>{
+                name: productName,
+                save: jest.fn().mockResolvedValueOnce({ name: productName, id: 1 }),
+            });
 
-            const result = (await resolver.createProduct(product.name)) as any;
+            const result = (await resolver.createProduct(productName)) as any;
 
-            expect(result.product).toBeTruthy();
-            expect(result.product.name).toBe(product.name);
+            expect(result.name).toBe(productName);
+            expect(result.id).toBe(1);
+            expect(Product.create).toHaveBeenCalledWith({ name: productName });
         });
     });
 
     describe("Mutation createManufacturer", () => {
         it("should create manufacturer with valid data", async () => {
-            jest.spyOn(Manufacturer, "create").mockImplementationOnce(
-                () =>
-                    <any>{
-                        save: jest.fn().mockResolvedValueOnce({ manufacturer }),
-                    }
-            );
+            const manufacturerName = "manufacturer";
+            jest.spyOn(Manufacturer, "create").mockReturnValueOnce(<any>{
+                name: manufacturerName,
+                save: jest.fn().mockResolvedValueOnce({ name: manufacturerName, id: 1 }),
+            });
 
-            const result = (await resolver.createManufacturer(manufacturer.name)) as any;
+            const result = (await resolver.createManufacturer(manufacturerName)) as any;
 
-            expect(result.manufacturer).toBeTruthy();
-            expect(result.manufacturer.name).toBe(manufacturer.name);
+            expect(result.name).toBe(manufacturerName);
+            expect(result.id).toBe(1);
+            expect(Manufacturer.create).toHaveBeenCalledWith({ name: manufacturerName });
         });
     });
 
     describe("Mutation addManufacturerProduct", () => {
         it("should add manufacturerProduct with valid data", async () => {
-            jest.spyOn(ManufacturerProduct, "create").mockImplementationOnce(
-                () =>
-                    <any>{
-                        save: jest.fn().mockResolvedValueOnce({ manufacturerProduct }),
-                    }
-            );
+            jest.spyOn(ManufacturerProduct, "create").mockReturnValueOnce(<any>{
+                manufacturerId: 1,
+                productId: 1,
+                save: jest
+                    .fn()
+                    .mockResolvedValueOnce({ manufacturerId: 1, productId: 1, id: 1 }),
+            });
 
-            const result = await resolver.addManufacturerProduct(
-                manufacturer.id,
-                product.id
-            );
+            const result = await resolver.addManufacturerProduct(1, 1);
 
             expect(result).toBe(true);
+            expect(ManufacturerProduct.create).toHaveBeenCalledWith({
+                manufacturerId: 1,
+                productId: 1,
+            });
         });
     });
 
@@ -86,9 +77,12 @@ describe("Resolver ManufacturerProductResolver", () => {
         it("should delete product with valid id", async () => {
             jest.spyOn(Product, "delete").mockImplementationOnce(jest.fn());
 
-            const result = await resolver.deleteProduct(product.id);
+            const result = await resolver.deleteProduct(1);
 
             expect(result).toBe(true);
+            expect(Product.delete).toHaveBeenCalledWith({
+                id: 1,
+            });
         });
     });
 
@@ -96,9 +90,12 @@ describe("Resolver ManufacturerProductResolver", () => {
         it("should delete manufacturer with valid id", async () => {
             jest.spyOn(Manufacturer, "delete").mockImplementationOnce(jest.fn());
 
-            const result = await resolver.deleteManufacturer(manufacturer.id);
+            const result = await resolver.deleteManufacturer(1);
 
             expect(result).toBe(true);
+            expect(Manufacturer.delete).toHaveBeenCalledWith({
+                id: 1,
+            });
         });
     });
 

@@ -1,10 +1,6 @@
 import "reflect-metadata";
 import Product from "../../../src/entity/Product";
 
-afterEach(() => {
-    jest.clearAllMocks();
-});
-
 describe("Product entity", () => {
     it("should load all manufacturers from relation", async () => {
         const manufacturersLoaderMock = {

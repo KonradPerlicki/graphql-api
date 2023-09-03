@@ -23,9 +23,7 @@ export default class ChangePasswordResolver {
         await user.save();
         cache.del(forgotPasswordPrefix + token);
 
-        if (user) {
-            ctx.req.session.userId = user.id;
-        }
+        ctx.req.session.userId = user.id;
 
         return user;
     }

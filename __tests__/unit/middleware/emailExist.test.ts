@@ -3,20 +3,22 @@ import { emailExist } from "../../../src/middleware/emailExist";
 import User from "../../../src/entity/User";
 
 const email = faker.internet.email();
-const middleware = new emailExist();
 
-afterEach(() => {
-    jest.clearAllMocks();
+jest.mock("../../../src/entity/User", () => {
+    return {
+        findOne: jest.fn(),
+    };
 });
 
-const userData: any = {
-    email,
-    password: "password",
-};
+let middleware: emailExist;
+
+beforeEach(() => {
+    middleware = new emailExist();
+});
 
 describe("Middleware emailExists", () => {
-    it("should validate correct email address", async () => {
-        jest.spyOn(User, "findOne").mockResolvedValueOnce(null);
+    it("should return true for not existing email address", async () => {
+        (User.findOne as jest.Mock).mockResolvedValue(null);
 
         const result = await middleware.validate(email);
 
@@ -24,7 +26,7 @@ describe("Middleware emailExists", () => {
     });
 
     it("should return false on duplicated email address", async () => {
-        jest.spyOn(User, "findOne").mockResolvedValueOnce(userData);
+        (User.findOne as jest.Mock).mockResolvedValue({ id: 1, email });
 
         const result = await middleware.validate(email);
 
