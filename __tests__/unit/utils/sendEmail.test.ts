@@ -1,11 +1,18 @@
 import { faker } from "@faker-js/faker";
-import { Subject, sendEmail } from "../../../src/utils/sendEmail";
+import { Subject, generateToken, sendEmail } from "../../../src/utils/sendEmail";
 import nodemailer from "nodemailer";
+import { forgotPasswordPrefix } from "../../../src/constants";
+import { cache } from "../../../src/cache";
+import { v4 } from "uuid";
 
 afterEach(() => {
     jest.clearAllMocks();
 });
 
+jest.mock("nodemailer");
+jest.mock("uuid");
+
+/* 
 jest.mock("nodemailer", () => {
     return {
         ...jest.requireActual("nodemailer"),
@@ -32,40 +39,50 @@ jest.mock("../../../src/utils/logger", () => {
                 info: jest.fn(),
             }
     );
-});
+}); */
 
 describe("Utils sendEmail", () => {
-    it("should send register email", async () => {
-        jest.spyOn(nodemailer, "createTransport").mockImplementationOnce(
-            () =>
-                <any>{
-                    sendMail: jest.fn().mockResolvedValueOnce("test"),
-                }
-        );
+    it("should send an email and return preview URL", async () => {
+        const email = faker.internet.email();
+        const transporterMock = {
+            sendMail: jest.fn().mockResolvedValueOnce({
+                messageId: "12345",
+                envelope: {},
+                accepted: ["test@example.com"],
+                rejected: [],
+            }),
+        };
+        (nodemailer.createTestAccount as jest.Mock).mockResolvedValueOnce({
+            user: "user",
+            pass: "pass",
+        });
+        (nodemailer.createTransport as jest.Mock).mockReturnValue(transporterMock);
+        (nodemailer.getTestMessageUrl as jest.Mock).mockReturnValue("test message url");
 
-        const data = await sendEmail(
-            faker.internet.email(),
-            faker.random.numeric(),
-            Subject.REGISTER
-        );
+        const data = await sendEmail(email, faker.random.numeric(), Subject.REGISTER);
 
+        expect(transporterMock.sendMail).toHaveBeenCalledWith({
+            from: expect.any(String),
+            to: email,
+            subject: Subject.REGISTER.title,
+            html: expect.any(String),
+        });
         expect(data).toBe("test message url");
     });
 
-    it("should send forgot email", async () => {
-        jest.spyOn(nodemailer, "createTransport").mockImplementationOnce(
-            () =>
-                <any>{
-                    sendMail: jest.fn().mockResolvedValueOnce("test"),
-                }
-        );
+    it("should generate a token and set it in cache", () => {
+        const testToken = "token";
+        const userId = "userId";
+        jest.spyOn(cache, "set").mockReturnValueOnce(true);
+        (v4 as jest.Mock).mockReturnValue(testToken);
 
-        const data = await sendEmail(
-            faker.internet.email(),
-            faker.random.numeric(),
-            Subject.FORGOTPASSWORD
-        );
+        const token = generateToken(userId, forgotPasswordPrefix);
 
-        expect(data).toBe("test message url");
+        expect(token).toBe(testToken);
+        expect(cache.set).toHaveBeenCalledWith(
+            forgotPasswordPrefix + token,
+            userId,
+            60 * 60 * 24
+        );
     });
 });
