@@ -1,15 +1,8 @@
 import "reflect-metadata";
 
-import {
-    ApolloServerPluginLandingPageGraphQLPlayground,
-    ApolloServerPluginLandingPageProductionDefault,
-} from "apollo-server-core";
+import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
 import { buildSchemaSync } from "type-graphql";
 import { ApolloServer } from "apollo-server-express";
-import queryComplexity, {
-    simpleEstimator,
-    fieldExtensionsEstimator,
-} from "graphql-query-complexity";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { addMocksToSchema } from "@graphql-tools/mock";
 import { createManufacturersLoader } from "./utils/manufacturersLoader";
@@ -17,11 +10,6 @@ import { createProductsLoader } from "./utils/productsLoader";
 
 const schema = buildSchemaSync({
     resolvers: [`${__dirname}/resolvers/**/*.ts`],
-    /* authChecker: ({ context: { req } }) => {
-        if(req.session.userId) return true;
-        return false; // or false if access is denied
-        return !!req.session.userId;
-    } */
 });
 
 const getApolloServer = (resolver?: object) =>
@@ -34,21 +22,6 @@ const getApolloServer = (resolver?: object) =>
                       resolvers: resolver,
                   })
                 : schema,
-        /* validationRules: [
-        queryComplexity({
-            maximumComplexity: 3,
-            variables: {},
-            onComplete: (complexity: number) => {
-                console.log("query ocmplexyty: ",complexity);
-            },
-            estimators: [
-                fieldExtensionsEstimator(),
-                simpleEstimator({
-                    defaultComplexity: 1
-                })
-            ]
-        })
-    ], */
         plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
         context: ({ req, res }) => ({
             req,
